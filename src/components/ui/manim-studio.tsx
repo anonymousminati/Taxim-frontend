@@ -9,11 +9,16 @@ import { api, handleApiError, createLoadingState, LoadingState } from "@/lib/api
 
 // Main Manim Studio Component
 const ManimStudio = () => {
+  // Generate unique session ID for this browser session
+  const [sessionId] = useState(() => {
+    return `frontend-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+  });
+
   const [messages, setMessages] = useState<ChatMessageType[]>([
     {
       id: '1',
       role: 'assistant',
-      content: 'Hello! I\'m here to help you create amazing mathematical animations with Manim. What would you like to animate today?',
+      content: `Hello! I'm here to help you create amazing mathematical animations with Manim. What would you like to animate today?\n\n*Session ID: ${sessionId}*`,
       timestamp: new Date()
     }
   ]);
@@ -81,11 +86,16 @@ class MyAnimation(Scene):
     setInputMessage('');
     
     // Set loading state
-    setLoadingState({ isLoading: true, error: null });
-
-    try {
-      // Generate animation from prompt
-      const response = await api.generateAnimation(currentPrompt);
+    setLoadingState({ isLoading: true, error: null });    try {
+      // Generate animation from prompt with unique session ID
+      const response = await api.generateAnimation(currentPrompt, sessionId);
+        // Debug logging to verify new code is received
+      const debugClassMatch = /class\s+(\w+)\s*\(/.exec(response.code);
+      console.log(`[Session ${sessionId}] New code received:`, {
+        codeLength: response.code.length,
+        preview: response.code.substring(0, 100) + '...',
+        className: debugClassMatch?.[1] ?? 'Unknown'
+      });
       
       // Update code editor with generated code (potentially fixed)
       setManimCode(response.code);
@@ -95,10 +105,16 @@ class MyAnimation(Scene):
       setVideoUrl(fullVideoUrl);
 
       // Automatically switch to preview tab when video is ready
-      setActiveTab('preview');
-
-      // Create detailed success message with metadata
+      setActiveTab('preview');      // Create detailed success message with metadata
+      const classMatch = /class\s+(\w+)\s*\(/.exec(response.code);
+      const className = classMatch?.[1] ?? 'Unknown';
       let successMessage = `✅ Great! I've generated a Manim animation for "${currentPrompt}".`;
+      
+      // Add code info
+      successMessage += `\n\n📝 **Generated Code Info:**`;
+      successMessage += `\n• Class Name: \`${className}\``;
+      successMessage += `\n• Code Length: ${response.code.length} characters`;
+      successMessage += `\n• Session ID: \`${sessionId.substring(0, 16)}...\``;
       
       if (response.metadata) {
         const { generationAttempts, wasCodeFixed, wasImproved, renderingAttempts } = response.metadata;
@@ -144,11 +160,9 @@ class MyAnimation(Scene):
   const handleRenderAnimation = async () => {
     if (!manimCode.trim() || renderingState.isLoading) return;
     
-    setRenderingState({ isLoading: true, error: null });
-
-    try {
-      // Render the current code
-      const response = await api.renderAnimation(manimCode);
+    setRenderingState({ isLoading: true, error: null });    try {
+      // Render the current code with session ID
+      const response = await api.renderAnimation(manimCode, sessionId);
       
       // Update code if it was fixed during rendering
       if (response.code && response.code !== manimCode) {
