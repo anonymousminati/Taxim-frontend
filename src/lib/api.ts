@@ -18,11 +18,23 @@ export interface GenerateResponse extends ApiResponse {
   code: string;
   videoPath: string;
   videoFileName: string;
+  metadata?: {
+    generationAttempts: number;
+    wasCodeFixed: boolean;
+    wasImproved: boolean;
+    renderingAttempts: number;
+  };
 }
 
 export interface RenderResponse extends ApiResponse {
   videoPath: string;
   videoFileName: string;
+  code: string;
+  metadata?: {
+    wasCodeFixed: boolean;
+    wasImproved: boolean;
+    renderingAttempts: number;
+  };
 }
 
 export interface ValidateResponse extends ApiResponse {

@@ -14,6 +14,8 @@ interface MainContentProps {
   onRender?: () => void;
   isRendering?: boolean;
   renderError?: string | null;
+  activeTab?: 'code' | 'preview';
+  onTabChange?: (tab: 'code' | 'preview') => void;
 }
 
 const MainContent = ({ 
@@ -22,7 +24,9 @@ const MainContent = ({
   videoUrl, 
   onRender, 
   isRendering = false,
-  renderError 
+  renderError,
+  activeTab = 'code',
+  onTabChange
 }: MainContentProps) => {
   return (
     <div className="flex-1 flex flex-col">
@@ -30,9 +34,8 @@ const MainContent = ({
         <h1 className="text-2xl font-bold">Manim Studio</h1>
         <p className="text-muted-foreground">Create beautiful mathematical animations with Python</p>
       </div>
-      
-      <div className="flex-1">
-        <Tabs defaultValue="code" className="h-full flex flex-col">
+        <div className="flex-1">
+        <Tabs value={activeTab} onValueChange={(value) => onTabChange?.(value as 'code' | 'preview')} className="h-full flex flex-col">
           <TabsList className="grid w-full grid-cols-2 mx-4 mt-4">
             <TabsTrigger value="code" className="flex items-center gap-2">
               <Code className="w-4 h-4" />
@@ -41,6 +44,9 @@ const MainContent = ({
             <TabsTrigger value="preview" className="flex items-center gap-2">
               <Eye className="w-4 h-4" />
               Preview
+              {videoUrl && (
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse ml-1" />
+              )}
             </TabsTrigger>
           </TabsList>
             <TabsContent value="code" className="flex-1 m-4 mt-2">

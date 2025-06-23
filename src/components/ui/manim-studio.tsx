@@ -35,6 +35,7 @@ class MyAnimation(Scene):
   const [videoUrl, setVideoUrl] = useState<string>();
   const [loadingState, setLoadingState] = useState<LoadingState>(createLoadingState());
   const [renderingState, setRenderingState] = useState<LoadingState>(createLoadingState());
+  const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
 
   // Check backend status on component mount
   useEffect(() => {
@@ -65,7 +66,6 @@ class MyAnimation(Scene):
       setMessages(prev => [...prev, errorMessage]);
     }
   };
-
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || loadingState.isLoading) return;
 
@@ -87,18 +87,42 @@ class MyAnimation(Scene):
       // Generate animation from prompt
       const response = await api.generateAnimation(currentPrompt);
       
-      // Update code editor with generated code
+      // Update code editor with generated code (potentially fixed)
       setManimCode(response.code);
       
       // Set video URL for preview
       const fullVideoUrl = api.getVideoUrl(response.videoFileName);
       setVideoUrl(fullVideoUrl);
 
-      // Add success message
+      // Automatically switch to preview tab when video is ready
+      setActiveTab('preview');
+
+      // Create detailed success message with metadata
+      let successMessage = `✅ Great! I've generated a Manim animation for "${currentPrompt}".`;
+      
+      if (response.metadata) {
+        const { generationAttempts, wasCodeFixed, wasImproved, renderingAttempts } = response.metadata;
+        
+        if (wasCodeFixed || wasImproved) {
+          successMessage += '\n\n🔧 **Code Improvements Made:**';
+          if (wasCodeFixed) {
+            successMessage += `\n• Fixed compilation errors (${generationAttempts} attempts)`;
+          }
+          if (wasImproved) {
+            successMessage += '\n• Enhanced code for better rendering';
+          }
+          if (renderingAttempts > 1) {
+            successMessage += `\n• Rendering succeeded after ${renderingAttempts} attempts`;
+          }
+        }
+      }
+      
+      successMessage += '\n\nThe animation is now playing in the Preview tab! You can modify the code and re-render if needed.';
+
       const aiResponse: ChatMessageType = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `✅ Great! I've generated a Manim animation for "${currentPrompt}". The code has been updated in the editor and the animation is ready to preview. You can modify the code and re-render if needed.`,
+        content: successMessage,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
@@ -108,7 +132,7 @@ class MyAnimation(Scene):
       const aiResponse: ChatMessageType = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `❌ Sorry, I encountered an error while generating the animation: ${errorMessage}. Please try again or check your backend connection.`,
+        content: `❌ Sorry, I encountered an error while generating the animation: ${errorMessage}. Please try again with a simpler prompt or check your backend connection.`,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
@@ -126,25 +150,55 @@ class MyAnimation(Scene):
       // Render the current code
       const response = await api.renderAnimation(manimCode);
       
+      // Update code if it was fixed during rendering
+      if (response.code && response.code !== manimCode) {
+        setManimCode(response.code);
+      }
+      
       // Set video URL for preview
       const fullVideoUrl = api.getVideoUrl(response.videoFileName);
       setVideoUrl(fullVideoUrl);
 
-      // Add success message
-      const successMessage: ChatMessageType = {
+      // Automatically switch to preview tab
+      setActiveTab('preview');
+
+      // Create detailed success message
+      let successMessage = '🎬 Animation rendered successfully!';
+      
+      if (response.metadata) {
+        const { wasCodeFixed, wasImproved, renderingAttempts } = response.metadata;
+        
+        if (wasCodeFixed || wasImproved) {
+          successMessage += '\n\n🔧 **Code Improvements Made:**';
+          if (wasCodeFixed) {
+            successMessage += '\n• Fixed compilation errors automatically';
+          }
+          if (wasImproved) {
+            successMessage += '\n• Enhanced code for better rendering';
+          }
+          if (renderingAttempts > 1) {
+            successMessage += `\n• Rendering succeeded after ${renderingAttempts} attempts`;
+          }
+          successMessage += '\n\nThe updated code is now in the editor.';
+        }
+      }
+      
+      successMessage += '\n\nYou can now view the animation in the Preview tab!';
+
+      const successMessageObj: ChatMessageType = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: '🎬 Animation rendered successfully! You can now view it in the Preview tab.',
+        content: successMessage,
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, successMessage]);
+      setMessages(prev => [...prev, successMessageObj]);
       
     } catch (error) {
       const errorMessage = handleApiError(error);
       const aiResponse: ChatMessageType = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: `❌ Error rendering animation: ${errorMessage}. Please check your code and try again.`,
+        content: `❌ Error rendering animation: ${errorMessage}. I tried to fix common issues automatically, but you may need to review the code manually.`,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
@@ -190,14 +244,15 @@ class MyAnimation(Scene):
         onKeyPress={handleKeyPress}
         isLoading={loadingState.isLoading}
       />
-      
-      <MainContent 
+        <MainContent 
         manimCode={manimCode}
         setManimCode={setManimCode}
         videoUrl={videoUrl}
         onRender={handleRenderAnimation}
         isRendering={renderingState.isLoading}
         renderError={renderingState.error}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
     </div>
   );

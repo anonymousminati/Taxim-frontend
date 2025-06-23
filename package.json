@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:integration": "npx tsx test/integration.test.ts"
+    "test:integration": "npx tsx test/integration.test.ts",
+    "test:error-handling": "npx tsx test/error-handling.test.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
