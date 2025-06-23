@@ -11,9 +11,19 @@ interface MainContentProps {
   manimCode: string;
   setManimCode: (code: string) => void;
   videoUrl?: string;
+  onRender?: () => void;
+  isRendering?: boolean;
+  renderError?: string | null;
 }
 
-const MainContent = ({ manimCode, setManimCode, videoUrl }: MainContentProps) => {
+const MainContent = ({ 
+  manimCode, 
+  setManimCode, 
+  videoUrl, 
+  onRender, 
+  isRendering = false,
+  renderError 
+}: MainContentProps) => {
   return (
     <div className="flex-1 flex flex-col">
       <div className="p-4 border-b bg-muted/30">
@@ -33,16 +43,26 @@ const MainContent = ({ manimCode, setManimCode, videoUrl }: MainContentProps) =>
               Preview
             </TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="code" className="flex-1 m-4 mt-2">
+            <TabsContent value="code" className="flex-1 m-4 mt-2">
             <Card className="h-full">
-              <CodeEditor code={manimCode} onChange={setManimCode} />
+              <CodeEditor 
+                code={manimCode} 
+                onChange={setManimCode}
+                onRender={onRender}
+                isRendering={isRendering}
+                renderError={renderError}
+              />
             </Card>
           </TabsContent>
           
           <TabsContent value="preview" className="flex-1 m-4 mt-2">
             <Card className="h-full">
-              <VideoPreview videoUrl={videoUrl} />
+              <VideoPreview 
+                videoUrl={videoUrl}
+                onRender={onRender}
+                isRendering={isRendering}
+                renderError={renderError}
+              />
             </Card>
           </TabsContent>
         </Tabs>

@@ -12,6 +12,7 @@ interface SidebarProps {
   setInputMessage: (message: string) => void;
   onSendMessage: () => void;
   onKeyPress: (e: React.KeyboardEvent) => void;
+  isLoading?: boolean;
 }
 
 const Sidebar = ({ 
@@ -19,7 +20,8 @@ const Sidebar = ({
   inputMessage, 
   setInputMessage, 
   onSendMessage, 
-  onKeyPress 
+  onKeyPress,
+  isLoading = false
 }: SidebarProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -40,6 +42,14 @@ const Sidebar = ({
         {messages.map((message) => (
           <ChatMessage key={message.id} message={message} />
         ))}
+        {isLoading && (
+          <div className="mb-4 p-3 rounded-lg bg-muted/50 border border-dashed">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+              Generating animation...
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
       
@@ -49,17 +59,22 @@ const Sidebar = ({
           <Textarea
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={onKeyPress}
+            onKeyDown={onKeyPress}
             placeholder="Ask about Manim animations..."
             className="flex-1 min-h-[40px] max-h-[120px]"
             rows={1}
+            disabled={isLoading}
           />
           <Button 
             onClick={onSendMessage}
-            disabled={!inputMessage.trim()}
+            disabled={!inputMessage.trim() || isLoading}
             size="sm"
           >
-            <Send className="w-4 h-4" />
+            {isLoading ? (
+              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </Button>
         </div>
       </div>
