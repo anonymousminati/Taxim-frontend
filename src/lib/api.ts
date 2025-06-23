@@ -4,7 +4,7 @@
  */
 
 // API configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 // API response types
 export interface ApiResponse<T = Record<string, unknown>> {
@@ -22,6 +22,8 @@ export interface GenerateResponse {
   code: string;
   videoPath: string;
   videoFileName: string;
+  sessionId?: string;
+  sessionInfo?: SessionInfo;
   metadata?: {
     generationAttempts: number;
     wasCodeFixed: boolean;
@@ -37,11 +39,44 @@ export interface RenderResponse {
   videoPath: string;
   videoFileName: string;
   code: string;
+  sessionId?: string;
+  sessionInfo?: SessionInfo;
   metadata?: {
     wasCodeFixed: boolean;
     wasImproved: boolean;
     renderingAttempts: number;
   };
+}
+
+export interface SessionInfo {
+  exists: boolean;
+  lastActivity?: Date;
+  codeHistory?: number;
+  errorHistory?: number;
+  conversationLength?: number;
+  userPreferences?: string[];
+}
+
+export interface SessionResponse {
+  success: boolean;
+  error?: string;
+  message?: string;
+  sessionId: string;
+  sessionInfo: SessionInfo;
+  activeSessions?: string[];
+  cleared?: boolean;
+  preferences?: Record<string, unknown>;
+}
+
+export interface ImproveResponse {
+  success: boolean;
+  error?: string;
+  message?: string;
+  code: string;
+  originalCode: string;
+  feedback: string;
+  sessionId: string;
+  sessionInfo: SessionInfo;
 }
 
 export interface ValidateResponse {
@@ -98,11 +133,9 @@ async function apiRequest<T = Record<string, unknown>>(
 
   try {
     const response = await fetch(url, config);
-    const data = await response.json();
-
-    if (!response.ok) {
+    const data = await response.json();    if (!response.ok) {
       throw new ApiError(
-        data.error || `HTTP error! status: ${response.status}`,
+        data.error ?? `HTTP error! status: ${response.status}`,
         response.status,
         data
       );
@@ -124,25 +157,83 @@ async function apiRequest<T = Record<string, unknown>>(
 // API service functions
 export const api = {
   /**
-   * Generate Manim animation from prompt
+   * Generate Manim animation from prompt with session support
    */
-  generateAnimation: async (prompt: string): Promise<GenerateResponse> => {
+  generateAnimation: async (
+    prompt: string, 
+    sessionId?: string, 
+    userPreferences?: Record<string, unknown>
+  ): Promise<GenerateResponse> => {
     return apiRequest<GenerateResponse>('/api/manim/generate', {
       method: 'POST',
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({ 
+        prompt, 
+        sessionId: sessionId ?? 'default',
+        userPreferences: userPreferences ?? {}
+      }),
     });
   },
 
   /**
-   * Render existing Manim code
+   * Render existing Manim code with session support
    */
-  renderAnimation: async (code: string): Promise<RenderResponse> => {
+  renderAnimation: async (code: string, sessionId?: string): Promise<RenderResponse> => {
     return apiRequest<RenderResponse>('/api/manim/render', {
       method: 'POST',
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ 
+        code, 
+        sessionId: sessionId ?? 'default'
+      }),
     });
   },
 
+  /**
+   * Improve existing Manim code with feedback and session context
+   */
+  improveCode: async (
+    code: string, 
+    feedback: string, 
+    sessionId?: string
+  ): Promise<ImproveResponse> => {
+    return apiRequest<ImproveResponse>('/api/manim/improve', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        code, 
+        feedback, 
+        sessionId: sessionId ?? 'default'
+      }),
+    });
+  },
+
+  /**
+   * Get session information
+   */
+  getSession: async (sessionId?: string): Promise<SessionResponse> => {
+    const endpoint = sessionId ? `/api/manim/session/${sessionId}` : '/api/manim/session';
+    return apiRequest<SessionResponse>(endpoint);
+  },
+
+  /**
+   * Clear a conversation session
+   */
+  clearSession: async (sessionId: string): Promise<SessionResponse> => {
+    return apiRequest<SessionResponse>(`/api/manim/session/${sessionId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  /**
+   * Set user preferences for a session
+   */
+  setSessionPreferences: async (
+    sessionId: string, 
+    preferences: Record<string, unknown>
+  ): Promise<SessionResponse> => {
+    return apiRequest<SessionResponse>(`/api/manim/session/${sessionId}/preferences`, {
+      method: 'POST',
+      body: JSON.stringify({ preferences }),
+    });
+  },
   /**
    * Validate Manim code
    */
