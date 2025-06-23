@@ -233,9 +233,8 @@ class MyAnimation(Scene):
   if (isMobile) {
     return <MobileWarning />;
   }
-
   return (
-    <div className="h-full flex bg-background">
+    <div className="h-full flex bg-gradient-to-br from-background via-background to-muted/20">
       <Sidebar 
         messages={messages}
         inputMessage={inputMessage}
@@ -244,7 +243,7 @@ class MyAnimation(Scene):
         onKeyPress={handleKeyPress}
         isLoading={loadingState.isLoading}
       />
-        <MainContent 
+      <MainContent 
         manimCode={manimCode}
         setManimCode={setManimCode}
         videoUrl={videoUrl}

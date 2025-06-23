@@ -7,14 +7,18 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 // API response types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = Record<string, unknown>> {
   success: boolean;
   error?: string;
   message?: string;
-  [key: string]: any;
+  data?: T;
+  [key: string]: unknown;
 }
 
-export interface GenerateResponse extends ApiResponse {
+export interface GenerateResponse {
+  success: boolean;
+  error?: string;
+  message?: string;
   code: string;
   videoPath: string;
   videoFileName: string;
@@ -26,7 +30,10 @@ export interface GenerateResponse extends ApiResponse {
   };
 }
 
-export interface RenderResponse extends ApiResponse {
+export interface RenderResponse {
+  success: boolean;
+  error?: string;
+  message?: string;
   videoPath: string;
   videoFileName: string;
   code: string;
@@ -37,11 +44,17 @@ export interface RenderResponse extends ApiResponse {
   };
 }
 
-export interface ValidateResponse extends ApiResponse {
+export interface ValidateResponse {
+  success: boolean;
+  error?: string;
+  message?: string;
   valid: boolean;
 }
 
-export interface StatusResponse extends ApiResponse {
+export interface StatusResponse {
+  success: boolean;
+  error?: string;
+  message?: string;
   requirements: {
     manim: { installed: boolean; version?: string };
     ffmpeg: { installed: boolean; version?: string };
@@ -69,7 +82,7 @@ export class ApiError extends Error {
 }
 
 // Generic API request function
-async function apiRequest<T = any>(
+async function apiRequest<T = Record<string, unknown>>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
@@ -153,7 +166,6 @@ export const api = {
   getVideoUrl: (videoFileName: string): string => {
     return `${API_BASE_URL}/animations/${videoFileName}`;
   },
-
   /**
    * Check if backend is healthy
    */

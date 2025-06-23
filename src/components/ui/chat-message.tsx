@@ -4,7 +4,7 @@ import React from "react";
 import { Bot, User } from "lucide-react";
 
 // Utility function
-function cn(...inputs: any[]) {
+function cn(...inputs: (string | undefined | null | boolean)[]): string {
   return inputs.filter(Boolean).join(' ');
 }
 
@@ -24,19 +24,22 @@ const ChatMessage = ({ message }: { message: ChatMessage }) => {
     <div className={cn("flex gap-3 mb-4", isUser ? "justify-end" : "justify-start")}>
       <div className={cn("flex gap-3 max-w-[80%]", isUser ? "flex-row-reverse" : "flex-row")}>
         <div className={cn(
-          "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-          isUser ? "bg-primary text-primary-foreground" : "bg-muted"
-        )}>
-          {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-        </div>
-        <div className={cn(
-          "rounded-lg p-3 text-sm",
+          "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border",
           isUser 
-            ? "bg-primary text-primary-foreground" 
-            : "bg-muted text-muted-foreground"
+            ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground border-primary/20" 
+            : "bg-gradient-to-br from-muted to-muted/80 border-border/50"
         )}>
-          <p className="whitespace-pre-wrap">{message.content}</p>
-          <div className="text-xs opacity-70 mt-1">
+          {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4 text-primary" />}
+        </div>        <div className={cn(
+          "rounded-lg p-3 text-sm border backdrop-blur-sm",
+          isUser 
+            ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground border-primary/20 shadow-lg" 
+            : "bg-gradient-to-br from-card to-card/80 text-foreground border-border/50 shadow-sm"
+        )}>
+          <p className="whitespace-pre-wrap">{message.content}</p>          <div className={cn(
+            "text-xs mt-1",
+            isUser ? "opacity-70" : "opacity-60 text-muted-foreground"
+          )}>
             {message.timestamp.toLocaleTimeString()}
           </div>
         </div>

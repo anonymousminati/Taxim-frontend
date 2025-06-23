@@ -36,15 +36,16 @@ const CodeEditor = ({
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
-  };return (
+  };  return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between p-3 border-b bg-muted/30">
-        <h3 className="font-semibold text-sm">Manim Code</h3>        <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={handleCopy}>
+      <div className="flex items-center justify-between p-3 border-b bg-gradient-to-r from-card/50 via-muted/30 to-card/50">
+        <h3 className="font-semibold text-sm text-foreground">Manim Code</h3>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={handleCopy} className="border-border/50 hover:bg-muted/50">
             <Copy className="w-4 h-4 mr-1" />
             Copy
           </Button>
-          <Button size="sm" variant="outline" onClick={handleSave}>
+          <Button size="sm" variant="outline" onClick={handleSave} className="border-border/50 hover:bg-muted/50">
             <Download className="w-4 h-4 mr-1" />
             Save
           </Button>
@@ -53,9 +54,10 @@ const CodeEditor = ({
               size="sm" 
               onClick={onRender}
               disabled={isRendering || !code.trim()}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {isRendering ? (
-                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mr-1" />
+                <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin mr-1" />
               ) : (
                 <Play className="w-4 h-4 mr-1" />
               )}
@@ -65,14 +67,14 @@ const CodeEditor = ({
         </div>
       </div>
       {renderError && (
-        <div className="p-3 bg-destructive/10 border-b border-destructive/20">
+        <div className="p-3 bg-gradient-to-r from-destructive/10 to-destructive/5 border-b border-destructive/20">
           <p className="text-sm text-destructive">❌ {renderError}</p>
         </div>
       )}
       <textarea
         value={code}
         onChange={(e) => onChange(e.target.value)}
-        className="flex-1 p-4 font-mono text-sm bg-background border-0 resize-none focus:outline-none"
+        className="flex-1 p-4 font-mono text-sm bg-card/30 text-foreground border-0 resize-none focus:outline-none focus:bg-card/50 transition-colors placeholder:text-muted-foreground/60"
         placeholder="# Write your Manim code here
 from manim import *
 
