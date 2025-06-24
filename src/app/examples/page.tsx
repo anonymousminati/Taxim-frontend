@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowLeft, Sparkles, Play } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { Metadata } from "next";
-import CopyButton from "@/components/ui/copy-button";
+import AnimationCard from "@/components/ui/animation-card";
 
 export const metadata: Metadata = {
   title: "Examples - Taxim AI Mathematical Animations",
@@ -53,17 +53,7 @@ export default function ExamplesPage() {
       prompt: "Create the Ulam spiral animation highlighting prime numbers in a spiral pattern",
       category: "Number Theory",
       difficulty: "Intermediate"
-    }
-  ];
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "Beginner": return "bg-green-500/20 text-green-300 border-green-500/30";
-      case "Intermediate": return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30";
-      case "Advanced": return "bg-red-500/20 text-red-300 border-red-500/30";
-      default: return "bg-gray-500/20 text-gray-300 border-gray-500/30";
-    }
-  };
+    }  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
@@ -120,64 +110,12 @@ export default function ExamplesPage() {
           <p className="text-xl text-gray-300 leading-relaxed">
             Get inspired by these mathematical animations created with Taxim. Copy the prompts and try them yourself!
           </p>
-        </div>
-
-        {/* Examples Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">          {examples.map((example) => (
-            <Card key={example.title} className="bg-slate-900/50 border-slate-700 backdrop-blur-sm hover:bg-slate-900/70 transition-all duration-300 group">
-              <CardHeader>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-purple-300 font-medium">{example.category}</span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(example.difficulty)}`}>
-                    {example.difficulty}
-                  </span>
-                </div>
-                <CardTitle className="text-white text-xl">{example.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-300 mb-4">
-                  {example.description}
-                </p>
-                
-                <div className="bg-slate-800/80 rounded-lg p-4 mb-4 border border-slate-600">
-                  <div className="text-xs text-gray-400 mb-2 font-medium">Prompt:</div>
-                  <code className="text-green-400 text-sm leading-relaxed">
-                    "{example.prompt}"
-                  </code>
-                </div>                <div className="flex gap-2">
-                  <Link href="/manim-studio" className="flex-1">
-                    <Button 
-                      size="sm" 
-                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm"
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      Try This
-                    </Button>
-                  </Link>
-                  <CopyButton text={example.prompt} />
-                </div>
-              </CardContent>
-            </Card>
+        </div>        {/* Examples Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {examples.map((example) => (
+            <AnimationCard key={example.title} example={example} />
           ))}
-        </div>
-
-        {/* Categories */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">Browse by Category</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {["Geometry", "Calculus", "Algorithms", "Linear Algebra", "Number Theory", "Statistics", "Physics", "Advanced Math"].map((category) => (
-              <Card key={category} className="bg-slate-900/30 border-slate-700 backdrop-blur-sm hover:bg-slate-900/50 transition-all duration-300 cursor-pointer group">
-                <CardContent className="p-4 text-center">
-                  <div className="text-white font-medium group-hover:text-purple-300 transition-colors">
-                    {category}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Tips Section */}
+        </div>        {/* Tips Section */}
         <div className="max-w-4xl mx-auto mb-16">
           <Card className="bg-slate-900/30 border-slate-700 backdrop-blur-sm">
             <CardHeader>

@@ -41,11 +41,44 @@ class MyAnimation(Scene):
   const [loadingState, setLoadingState] = useState<LoadingState>(createLoadingState());
   const [renderingState, setRenderingState] = useState<LoadingState>(createLoadingState());
   const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
-
   // Check backend status on component mount
   useEffect(() => {
     checkBackendStatus();
+    checkForCopiedPrompt();
   }, []);
+
+  const checkForCopiedPrompt = () => {
+    const copiedPrompt = localStorage.getItem('taxim-copied-prompt');
+    const copiedTimestamp = localStorage.getItem('taxim-copied-prompt-timestamp');
+    
+    if (copiedPrompt && copiedTimestamp) {
+      const timestamp = parseInt(copiedTimestamp);
+      const now = Date.now();
+      const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+      
+      // Only use the prompt if it was copied within the last hour
+      if (now - timestamp < oneHour) {
+        setInputMessage(copiedPrompt);
+        
+        // Add a message indicating the prompt was loaded
+        const promptLoadedMessage: ChatMessageType = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `📋 I found a copied prompt from the Examples page: "${copiedPrompt}"\n\nI've loaded it for you. Click Send to generate the animation!`,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, promptLoadedMessage]);
+        
+        // Clear the stored prompt after using it
+        localStorage.removeItem('taxim-copied-prompt');
+        localStorage.removeItem('taxim-copied-prompt-timestamp');
+      } else {
+        // Clear expired prompts
+        localStorage.removeItem('taxim-copied-prompt');
+        localStorage.removeItem('taxim-copied-prompt-timestamp');
+      }
+    }
+  };
 
   const checkBackendStatus = async () => {
     try {

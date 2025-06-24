@@ -77,8 +77,7 @@ export default function HomePage() {
             <div className="w-full max-w-2xl">
               <h3 className="text-center text-lg text-gray-300 mb-4">
                 🎬 Watch Bubble Sort Algorithm Animation
-              </h3>
-              <AutoPlayVideoPlayer 
+              </h3>              <AutoPlayVideoPlayer 
                 src="/DemoVideo.mp4"
                 className="rounded-xl border border-slate-700 shadow-2xl"
                 poster="/demo-poster.jpg"
