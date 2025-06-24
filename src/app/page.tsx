@@ -1,5 +1,5 @@
-import ManimStudio from "@/components/ui/manim-studio";
+import HomePage from "@/components/HomePage";
 
 export default function Home() {
-  return <ManimStudio />;
+  return <HomePage />;
 }

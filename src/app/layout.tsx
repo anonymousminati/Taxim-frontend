@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Manim Studio - Create Mathematical Animations",
-  description: "AI-powered Manim animation creator. Generate beautiful mathematical animations with Python and Manim.",
-  keywords: ["manim", "animation", "mathematics", "python", "ai", "education"],
-  authors: [{ name: "Manim Studio" }],
+  title: "Taxim - AI-Powered Mathematical Animations",
+  description: "Transform complex mathematical concepts into stunning visual animations with the power of AI and Manim. No coding experience required.",
+  keywords: ["manim", "animation", "mathematics", "python", "ai", "education", "taxim"],
+  authors: [{ name: "Taxim" }],
 };
 
 export function generateViewport() {
