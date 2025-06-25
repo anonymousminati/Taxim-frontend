@@ -7,6 +7,18 @@ import MobileWarning from "./mobile-warning";
 import { ChatMessageType } from "./chat-message";
 import { api, handleApiError, createLoadingState, LoadingState } from "@/lib/api";
 
+// Add this function to test backend connection
+const testBackendConnection = async () => {
+  try {
+    const health = await api.healthCheck();
+    console.log('✅ Backend connected:', health);
+    alert(`✅ Backend is running! Status: ${health.message}`);
+  } catch (error) {
+    console.error('❌ Backend connection failed:', handleApiError(error));
+    alert(`❌ Backend connection failed: ${handleApiError(error)}`);
+  }
+};
+
 // Main Manim Studio Component
 const ManimStudio = () => {
   // Generate unique session ID for this browser session
