@@ -51,6 +51,8 @@ Create stunning mathematical animations using natural language prompts! Taxim Ma
 - **npm**, **yarn**, **pnpm**, or **bun**
 - **Backend server** running on port 3001
 
+### Please Note- Clone backend from [Taxim-Backend repo](https://github.com/anonymousminati/Taxim-backend)
+
 ### Setup Steps
 
 1. **Clone the repository**
@@ -90,6 +92,18 @@ Create stunning mathematical animations using natural language prompts! Taxim Ma
 5. **Open application**
    
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 📜 Available Scripts
+
+### Development Scripts
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint code analysis
+
+### Deployment Scripts
+- `npm run build:github` - Build optimized for GitHub Pages
+- `npm run export` - Generate static export for hosting
 
 ## 🏗️ Project Structure
 
@@ -184,15 +198,23 @@ POST /api/sessions        - Create/manage sessions
 # API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:3001  # Backend server URL
 
+# Deployment Configuration (set automatically)
+GITHUB_PAGES=true                         # Enable GitHub Pages mode
+NODE_ENV=production                       # Environment mode (auto-set)
+BUILD_STATIC=true                         # Enable static export mode
+
 # Optional: Development settings
-NODE_ENV=development                       # Environment mode
+NODE_ENV=development                      # Environment mode
 ```
 
 ### Next.js Configuration
 Key configurations in `next.config.ts`:
+- **GitHub Pages Support**: Automatic static export with proper base path
 - **Turbopack**: Enabled for faster development builds
 - **TypeScript**: Strict type checking enabled
 - **ESLint**: Integrated linting during builds
+- **Image Optimization**: Disabled for static export compatibility
+- **Asset Prefix**: Configurable for different hosting environments
 
 ### Tailwind Configuration
 Custom styling in `tailwind.config.js`:
@@ -230,7 +252,48 @@ npm start
 
 ### Platform Deployment
 
-#### Vercel (Recommended)
+#### GitHub Pages (Recommended for Demo)
+The project is pre-configured for GitHub Pages deployment with automated CI/CD:
+
+1. **Automatic Deployment**
+   - Push changes to the `main` branch
+   - GitHub Actions automatically builds and deploys to GitHub Pages
+   - Site will be available at `https://yourusername.github.io/taxim/`
+
+2. **GitHub Actions Workflow**
+   - Located at `.github/workflows/deploy.yml`
+   - Triggers on push to `main` branch
+   - Builds static site and deploys to `gh-pages` branch
+   - Includes proper permissions and artifact handling
+
+3. **Manual Deployment**
+   ```bash
+   # Build for GitHub Pages
+   npm run build:github
+   
+   # Or using the export script
+   npm run export
+   ```
+
+4. **Configuration**
+   - The project uses static export with `output: 'export'`
+   - Base path configured as `/taxim` for GitHub Pages
+   - Assets optimized for static hosting
+   - `.nojekyll` file included for proper routing
+
+5. **Environment Variables**
+   ```bash
+   # Set in GitHub repository secrets or variables
+   NEXT_PUBLIC_API_URL=https://your-backend-domain.com
+   ```
+
+6. **Setup Steps**
+   - Go to repository Settings → Pages
+   - Set source to "Deploy from a branch"
+   - Select `gh-pages` branch
+   - The workflow will automatically deploy on next push
+
+#### Vercel
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -240,6 +303,17 @@ vercel
 
 # Configure environment variables in Vercel dashboard
 # NEXT_PUBLIC_API_URL = https://your-backend-domain.com
+```
+
+#### Netlify
+```bash
+# Install Netlify CLI
+npm install netlify-cli -g
+
+# Build and deploy
+netlify deploy --prod --dir=out
+
+# Configure environment variables in Netlify dashboard
 ```
 
 #### Docker
@@ -257,17 +331,14 @@ EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
-#### Static Export (if applicable)
+#### Static Hosting (CDN)
+For AWS S3, Azure Storage, or other static hosts:
 ```bash
-# Add to next.config.ts
-const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
-  images: { unoptimized: true }
-}
-
 # Build static files
-npm run build
+npm run export
+
+# Upload 'out' directory to your static host
+# Configure custom domain and SSL if needed
 ```
 
 ## 📱 Browser Support
@@ -391,13 +462,10 @@ rm -rf .next/cache
 - **Reusability**: Create modular, reusable components
 - **Error boundaries**: Handle errors gracefully
 
-## 📄 License
-
-This project is part of the Taxim Manim Studio suite. Please refer to the main project license for usage terms.
 
 ## 🔗 Related Projects
 
-- **[Taxim Backend](../backend/README.md)** - Node.js/Express API server
+- **[Taxim Backend](https://github.com/anonymousminati/Taxim-backend)** - Node.js/Express API server
 - **[Manim Community](https://www.manim.community/)** - Mathematical animation library
 - **[Next.js](https://nextjs.org/)** - React framework
 
