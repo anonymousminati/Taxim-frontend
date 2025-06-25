@@ -4,7 +4,7 @@
  */
 
 // API configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://taxim-backend-272668880114.asia-south1.run.app';
 
 // API response types
 export interface ApiResponse<T = Record<string, unknown>> {
